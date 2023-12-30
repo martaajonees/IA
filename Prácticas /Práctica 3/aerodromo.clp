@@ -77,6 +77,6 @@
     ?pil <- (Piloto (aeronave ?id)(accion Ejecutando))
     =>
     (modify ?avion (estado Crucero)(velocidad_actual ?vc))
-    (println "El despegue ha sido correcto. El vuelo realizará desde " ?or " con destino " ?dest " con un tiempo estimado de " (calcular-tiempo-horas ?dist ?vc) " horas "(calcular-tiempo-minutos ?dist ?vc))
+    (println "El despegue ha sido correcto. El vuelo realizará desde " ?or " con destino " ?dest " con un tiempo estimado de " (calcular-tiempo-horas ?dist ?vc) " horas y "(calcular-tiempo-minutos ?dist ?vc)" minutos")
     (modify ?pil (accion Stand-by))
 )
