@@ -31,7 +31,7 @@
 ; Reglas
 ; Asignamos pedido de un cliente a un camarero
 (defrule AsignarVenta (declare (salience 10))
-    (Venta (DNI ?dni) (Identificador ?id)(Unidades ?unidades)(Metodo_pago ?metodo))
+    ?v <- (Venta (DNI ?dni) (Identificador ?id)(Unidades ?unidades)(Metodo_pago ?metodo))
     ?pers <- (Personal (DNI ?dni) (Total_ventas ?ventas)(Nombre ?nombre))
     ?prod <- (Producto (Identificador ?id)(Nombre ?nombre2) (Precio ?precio) (StockCafeteria ?stockcafeteria))
     ; Que haya stock suficiente en la cafeteria
@@ -46,7 +46,8 @@
     
     ; Imprimo
     (println ?nombre ": " ?unidades" de " ?nombre2 ", " ?precio_total "€ pagados con " ?metodo)
-    (println ?nombre "acumula un total de " ?ventas "€ en la jornada de hoy")
+    (println ?nombre " acumula un total de " ?ventas "€ en la jornada de hoy")
+    (retract ?v)
 )
 ; funcion Reponer
 (deffunction Reposicion (?almacen ?maximo)
@@ -64,4 +65,12 @@
     (test (< ?stockcafeteria 10))
     =>
     (modify ?prod (StockCafeteria (Reposicion ?stockalmacen ?max)))
+) 
+
+; Hechos iniciales
+
+(deffacts hechos-iniciales
+    (Producto (Identificador cafe) (Nombre "Café") (StockCafeteria 32) (StockAlmacen 400) (Precio 0.95) (MaximoStock 60))
+    (Personal (Nombre "María") (DNI 11) (Turno Mañana) (Total_ventas 45) (Encargado Si))
+    (Venta (DNI 11) (Identificador cafe) (Unidades 5) (Metodo_pago Efectivo))
 )
