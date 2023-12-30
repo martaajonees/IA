@@ -47,7 +47,7 @@
     (println "La aeronave " ?id " de la compañía " ?comp " va a realizar la acción despegue desde el aeródromo " ?id1 " de " ?ciudad " con destino " ?dest)
 )
 
-(defrule Excepción
+(defrule Excepcion
     ?avion <- (Aeronave (id ?id) (peticion Despegue)(compañia ?comp)(origen ?or)(destino ?dest))
     (Piloto (aeronave ?id)(accion ?estado))
     (test (neq ?estado OK))
