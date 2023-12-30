@@ -50,12 +50,12 @@
     (retract ?v)
 )
 ; funcion Reponer
-(deffunction Reposicion (?almacen ?maximo)
-    (if (> ?maximo ?almacen)
+(deffunction Reposicion (?almacen ?maximo ?almcaf)
+    (if (<= ?maximo ?almacen)
         then
-            (return (- ?maximo ?almacen))
+            (return (- ?maximo ?almcaf))
         else
-            (return ?maximo)
+            (return ?almacen)
     )
 )
 ; Regla ReponerStock
@@ -64,7 +64,8 @@
     ?prod <- (Producto (StockCafeteria ?stockcafeteria) (StockAlmacen ?stockalmacen)(MaximoStock ?max))
     (test (< ?stockcafeteria 10))
     =>
-    (modify ?prod (StockCafeteria (Reposicion ?stockalmacen ?max)))
+    (bind ?cantidad (Reposicion ?stockalmacen ?max ?stockcafeteria))
+    (modify ?prod (StockAlmacen (- ?stockalmacen ?cantidad)) (StockCafeteria (+ ?stockcafeteria ?cantidad)))
 ) 
 
 ; Hechos iniciales
