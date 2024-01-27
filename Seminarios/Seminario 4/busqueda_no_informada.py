@@ -149,10 +149,10 @@ def profundidad_limitada(limite:int) -> bool:
 
 # Nodos Visitados:  37
 # Nodos Generados:  34
-def profundidad_iterativa() -> bool:
+def profundidad_iterativa(limite:int) -> bool:
     objetivo = False
-    limite = 0
-    while not objetivo:
+    cont = 0
+    while not objetivo and cont < limite:
         objetivo = profundidad_limitada(limite)
-        limite += 1
+        cont += 1
     return objetivo
