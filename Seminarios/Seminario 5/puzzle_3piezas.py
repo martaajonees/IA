@@ -1,5 +1,6 @@
 
 from dataclasses import dataclass
+from copy import deepcopy
 import numpy as np
 
 operadores = {"1": "ARRIBA_A", "2": "ABAJO_A", "3": "IZQUIERDA_A", "4": "DERECHA_A", 
@@ -8,11 +9,10 @@ operadores = {"1": "ARRIBA_A", "2": "ABAJO_A", "3": "IZQUIERDA_A", "4": "DERECHA
 
 @dataclass
 class tEstado:
-    M: np.ndarray
+    M: np.array
     filas: list
     columnas: list
     N: int
-    M: int
 
     def __init__(self, tablero, filas, columnas):
         self.M = tablero
@@ -20,11 +20,15 @@ class tEstado:
         self.filas = filas
         self.columnas = columnas
     
+    
+    def crearHash(self):
+        return f"{self.M.tobytes()}{self.N}{self.filas}{self.columnas}"
+    
     def __str__(self):
         v = {-1: "⬛️", 0: "⬜️", 1: "🟦", 2: "🟩", 3: "🟥" }
         str = ""
         for i in range(self.N):
-            for j in range(self.M):
+            for j in range(self.N):
                 str += f"{v[self.M[i, j]]}"
             str += '\n'
         return  str
@@ -37,7 +41,7 @@ def heuristica(actual:tEstado) -> int:
     return distancia_A + distancia_B + distancia_C
 
 def estadoInicial()-> tEstado:
-    tablero = np.ndarray(
+    tablero = np.array(
         [
             [-1, 0, 0, 3, 0, 0],
             [-1, 0, 0, 3, 0, 0],
@@ -50,7 +54,7 @@ def estadoInicial()-> tEstado:
     return tEstado(tablero, [3, 4, 1], [1, 4, 3])
 
 def estadoObjetivo() -> tEstado:
-    tablero = np.ndarray(
+    tablero = np.array(
         [
             [-1, 0, 0, 0, 0, 0],
             [-1, 0, 0, 0, 0, 0],
@@ -164,112 +168,112 @@ def aplicaOperador(op, estado) -> tEstado:
                 nuevo.filas[0] -= 1
             case "2":
                 # Mover A hacia abajo
-                estado.M[estado.filas[0]+1, estado.columnas[0]-1] = 1 
-                estado.M[estado.filas[0]+1, estado.columnas[0]+1] = 1 
-                estado.M[estado.filas[0]+2, estado.columnas[0]] = 1
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]-1] = 1 
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]+1] = 1 
+                nuevo.M[estado.filas[0]+2, estado.columnas[0]] = 1
                 # Quita A de su posición original
-                estado.M[estado.filas[0], estado.columnas[0]-1] = 0
-                estado.M[estado.filas[0], estado.columnas[0]+1] = 0
-                estado.M[estado.filas[0]-1, estado.columnas[0]] = 0
+                nuevo.M[estado.filas[0], estado.columnas[0]-1] = 0
+                nuevo.M[estado.filas[0], estado.columnas[0]+1] = 0
+                nuevo.M[estado.filas[0]-1, estado.columnas[0]] = 0
                 # Actualiza posición de A
-                estado.filas[0] += 1
+                nuevo.filas[0] += 1
             case "3":
                 # Mover A hacia la izquierda
-                estado.M[estado.filas[0]-1, estado.columnas[0]-1] = 1 
-                estado.M[estado.filas[0]+1, estado.columnas[0]-1] = 1 
-                estado.M[estado.filas[0], estado.columnas[0]-2] = 1
+                nuevo.M[estado.filas[0]-1, estado.columnas[0]-1] = 1 
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]-1] = 1 
+                nuevo.M[estado.filas[0], estado.columnas[0]-2] = 1
                 # Quita A de su posición original
-                estado.M[estado.filas[0]-1, estado.columnas[0]] = 0
-                estado.M[estado.filas[0]+1, estado.columnas[0]] = 0
-                estado.M[estado.filas[0], estado.columnas[0]+1] = 0
+                nuevo.M[estado.filas[0]-1, estado.columnas[0]] = 0
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]] = 0
+                nuevo.M[estado.filas[0], estado.columnas[0]+1] = 0
                 # Actualiza posición de A
-                estado.columnas[0] -= 1
+                nuevo.columnas[0] -= 1
             case "4":
                 # Mover A hacia la derecha
-                estado.M[estado.filas[0]-1, estado.columnas[0]+1] = 1
-                estado.M[estado.filas[0]+1, estado.columnas[0]+1] = 1 
-                estado.M[estado.filas[0], estado.columnas[0]+2] = 1
+                nuevo.M[estado.filas[0]-1, estado.columnas[0]+1] = 1
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]+1] = 1 
+                nuevo.M[estado.filas[0], estado.columnas[0]+2] = 1
                 # Quita A de su posición original
-                estado.M[estado.filas[0]-1, estado.columnas[0]] = 0
-                estado.M[estado.filas[0]+1, estado.columnas[0]] = 0
-                estado.M[estado.filas[0], estado.columnas[0]-1] = 0
+                nuevo.M[estado.filas[0]-1, estado.columnas[0]] = 0
+                nuevo.M[estado.filas[0]+1, estado.columnas[0]] = 0
+                nuevo.M[estado.filas[0], estado.columnas[0]-1] = 0
                 # Actualiza posición de A
-                estado.columnas[0] += 1
+                nuevo.columnas[0] += 1
             case "5":
                 # Mover B hacia arriba
-                estado.M[estado.filas[1]-1, estado.columnas[1]-1] = 2
-                estado.M[estado.filas[1]-1, estado.columnas[1]+1] = 2
-                estado.M[estado.filas[1]-2, estado.columnas[1]] = 2
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]-1] = 2
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]+1] = 2
+                nuevo.M[estado.filas[1]-2, estado.columnas[1]] = 2
                 # Quita B de su posición original
-                estado.M[estado.filas[1], estado.columnas[1]-1] = 0
-                estado.M[estado.filas[1], estado.columnas[1]+1] = 0
-                estado.M[estado.filas[1], estado.columnas[1]] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]-1] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]+1] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]] = 0
                 # Actualiza posición de B
-                estado.filas[1] -= 1
+                nuevo.filas[1] -= 1
             case "6":
                 # Mover B hacia abajo
-                estado.M[estado.filas[1]+1, estado.columnas[1]-1] = 2 
-                estado.M[estado.filas[1]+1, estado.columnas[1]+1] = 2 
-                estado.M[estado.filas[1]+1, estado.columnas[1]] = 2
+                nuevo.M[estado.filas[1]+1, estado.columnas[1]-1] = 2 
+                nuevo.M[estado.filas[1]+1, estado.columnas[1]+1] = 2 
+                nuevo.M[estado.filas[1]+1, estado.columnas[1]] = 2
                 # Quita B de su posición original
-                estado.M[estado.filas[1], estado.columnas[1]-1] = 0
-                estado.M[estado.filas[1], estado.columnas[1]+1] = 0
-                estado.M[estado.filas[1]-1, estado.columnas[1]] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]-1] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]+1] = 0
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]] = 0
                 # Actualiza posición de B
-                estado.filas[1] += 1
+                nuevo.filas[1] += 1
             case "7":
                 # Mover B hacia la izquierda
-                estado.M[estado.filas[1]-1, estado.columnas[1]-1] = 2
-                estado.M[estado.filas[1], estado.columnas[1]-2] = 2
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]-1] = 2
+                nuevo.M[estado.filas[1], estado.columnas[1]-2] = 2
                 # Quita B de su posición original
-                estado.M[estado.filas[1]-1, estado.columnas[1]] = 0
-                estado.M[estado.filas[1], estado.columnas[1]+1] = 0
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]+1] = 0
                 # Actualiza posición de B
-                estado.columnas[1] -= 1
+                nuevo.columnas[1] -= 1
             case "8":
                 # Mover B hacia la derecha
-                estado.M[estado.filas[1]-1, estado.columnas[1]+1] = 2
-                estado.M[estado.filas[1], estado.columnas[1]+2] = 2
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]+1] = 2
+                nuevo.M[estado.filas[1], estado.columnas[1]+2] = 2
                 # Quita B de su posición original
-                estado.M[estado.filas[1]-1, estado.columnas[1]] = 0
-                estado.M[estado.filas[1], estado.columnas[1]-1] = 0
+                nuevo.M[estado.filas[1]-1, estado.columnas[1]] = 0
+                nuevo.M[estado.filas[1], estado.columnas[1]-1] = 0
                 # Actualiza posición de B
-                estado.columnas[1] += 1
+                nuevo.columnas[1] += 1
             case "9":
                 # Mover C hacia arriba
-                estado.M[estado.filas[2]-2, estado.columnas[2]] = 3
+                nuevo.M[estado.filas[2]-2, estado.columnas[2]] = 3
                 # Quita C de su posición original
-                estado.M[estado.filas[2]+1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]+1, estado.columnas[2]] = 0
                 # Actualiza posición de C
-                estado.filas[2] -= 1
+                nuevo.filas[2] -= 1
             case "10":
                 # Mover C hacia abajo
-                estado.M[estado.filas[2]+2, estado.columnas[2]] = 3
+                nuevo.M[estado.filas[2]+2, estado.columnas[2]] = 3
                 # Quita C de su posición original
-                estado.M[estado.filas[2]-1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]-1, estado.columnas[2]] = 0
                 # Actualiza posición de C
-                estado.filas[2] += 1
+                nuevo.filas[2] += 1
             case "11":
                 # Mover C hacia la izquierda
-                estado.M[estado.filas[2]-1, estado.columnas[2]-1] = 3
-                estado.M[estado.filas[2], estado.columnas[2]-1] = 3
-                estado.M[estado.filas[2]+1, estado.columnas[2]-1] = 3
+                nuevo.M[estado.filas[2]-1, estado.columnas[2]-1] = 3
+                nuevo.M[estado.filas[2], estado.columnas[2]-1] = 3
+                nuevo.M[estado.filas[2]+1, estado.columnas[2]-1] = 3
                 # Quita C de su posición original
-                estado.M[estado.filas[2]-1, estado.columnas[2]] = 0
-                estado.M[estado.filas[2], estado.columnas[2]] = 0
-                estado.M[estado.filas[2]+1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]-1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2], estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]+1, estado.columnas[2]] = 0
                 # Actualiza posición de C
-                estado.columnas[2] -= 1
+                nuevo.columnas[2] -= 1
             case "12":
                 # Mover C hacia la derecha
-                estado.M[estado.filas[2]-1, estado.columnas[2]+1] = 3
-                estado.M[estado.filas[2], estado.columnas[2]+1] = 3
-                estado.M[estado.filas[2]+1, estado.columnas[2]+1] = 3
+                nuevo.M[estado.filas[2]-1, estado.columnas[2]+1] = 3
+                nuevo.M[estado.filas[2], estado.columnas[2]+1] = 3
+                nuevo.M[estado.filas[2]+1, estado.columnas[2]+1] = 3
                 # Quita C de su posición original
-                estado.M[estado.filas[2]-1, estado.columnas[2]] = 0
-                estado.M[estado.filas[2], estado.columnas[2]] = 0
-                estado.M[estado.filas[2]+1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]-1, estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2], estado.columnas[2]] = 0
+                nuevo.M[estado.filas[2]+1, estado.columnas[2]] = 0
                 # Actualiza posición de C
-                estado.columnas[2] += 1
+                nuevo.columnas[2] += 1
         return nuevo
 
