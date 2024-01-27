@@ -1,5 +1,3 @@
-# Para probar las búsquedas
-
 
 from ladrones_cinta import *
 
@@ -59,7 +57,8 @@ def main():
                 print("La búsqueda con profundidad limitada no fue exitosa.")
 
         case "5":
-            resultado = profundidad_iterativa()
+            limite = int(input("Introduce el límite de profundidad: "))
+            resultado = profundidad_iterativa(limite)
             if resultado:
                 print("La búsqueda con profundidad iterativa fue exitosa.")
             else:
